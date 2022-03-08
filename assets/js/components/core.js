@@ -25,7 +25,7 @@ function coreFunc() {
   //
 
   /*
-  RENDER: ci sono diversi render in ThreeJS, per ora usiamo il render di WebGL.
+  RENDER: ci sono diversi render in ThreeJS, per ora uso il render di WebGL.
   Imposto la grandezza del renderer, e lo aggiungo al documento HTML.
   */
   const renderer = new THREE.WebGLRenderer()
