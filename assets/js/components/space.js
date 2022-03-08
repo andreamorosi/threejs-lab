@@ -8,7 +8,7 @@ function spaceFunc() {
 
   let cubeContainer = document.querySelector('#cube-scene')
   var clock = new THREE.Clock()
-  var dragControls
+  var dragControls, raycaster, pointer, INTERSECTED
   const cubeCore = []
 
   //SCENE 
@@ -24,19 +24,22 @@ function spaceFunc() {
 
     ∆ per ora utilizzo una camera PerspectiveCamera, però ce ne sono altre.
   */
-  const camera = new THREE.PerspectiveCamera( 100, cubeContainer.clientWidth / cubeContainer.clientHeight, 0.1, 1000 )
+  const camera = new THREE.PerspectiveCamera( 70, cubeContainer.clientWidth / cubeContainer.clientHeight, 0.1, 1000 )
   
-  camera.position.set(3,1,9)
+  //camera.position.set(3,1,9)
+  camera.position.z = 25
   camera.lookAt( 0,0,0 )
   //
 
   // Luce
-  const pointLight = new THREE.PointLight(0xffffff)
-  pointLight.position.set(2,2,3.5)
-  scene.add(pointLight)
+  scene.add( new THREE.AmbientLight( 0x505050 ) )
+  const light = new THREE.DirectionalLight(0xffffff, 1.5)
+  //light.position.set(2,2,3.5)
+  light.position.set(1,1,1)
+  scene.add(light)
   
-  const ambientLight = new THREE.AmbientLight(0xffffff)
-  scene.add(ambientLight)
+  /*const ambientLight = new THREE.AmbientLight(0xffffff)
+  scene.add(ambientLight)*/
 
   /*
   RENDER: ci sono diversi render in ThreeJS, per ora uso il render di WebGL.
@@ -45,6 +48,11 @@ function spaceFunc() {
   const renderer = new THREE.WebGLRenderer({alpha: false, antialias: true})
   renderer.setSize( cubeContainer.clientWidth, cubeContainer.clientHeight )
   cubeContainer.appendChild( renderer.domElement )
+  //
+
+  // Raycast initializing
+  raycaster = new THREE.Raycaster()
+  pointer = new THREE.Vector2()
   //
 
   /*
@@ -153,7 +161,7 @@ function spaceFunc() {
   sphere.position.z = -2
 
   setTimeout(() => {
-    alert("controls ready")
+    console.log("controls ready")
     dragControls = new DragControls( [...scene.children], camera, renderer.domElement );
     dragControls.addEventListener( 'drag', render );
     dragControls.enabled = false
@@ -204,7 +212,56 @@ function spaceFunc() {
   }
   //
 
+  /*
+  function detectMouseMove(event) {
+    event.preventDefault()
+    mouse.x = (event.offsetX / myWidth) * 2 - 1;
+    mouse.y = -(event.offsetY / myHeight) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    var intersects = raycaster.intersectObjects(scene.children, true);
+    var wpVector = new THREE.Vector3();
+    
+    if(intersects.length > 0) {
+      intersects[0].object.updateMatrixWorld();
+      wpVector.setFromMatrixPosition(intersects[0].object.matrixWorld);
+      wpVector.project(camera);
+    }
+  }
+  */
+
+  function onPointerMove(event) {
+    //cubeContainer.clientWidth
+    pointer.x = ( event.clientX / cubeContainer.clientWidth ) * 2 - 1;
+    pointer.y = - ( event.clientY / cubeContainer.clientHeight ) * 2 + 1;
+  }
+  document.addEventListener( 'mousemove', onPointerMove );
+
   function render () {
+    camera.updateMatrixWorld();
+
+    // update the picking ray with the camera and pointer position
+	  raycaster.setFromCamera( pointer, camera );
+
+    // calculate objects intersecting the picking ray
+    const intersects = raycaster.intersectObjects( scene.children );
+      
+    if ( intersects.length > 0 ) {
+      console.log(intersects[ 0 ])
+      intersects[ 0 ].object.updateMatrixWorld()
+
+      if ( INTERSECTED != intersects[ 0 ].object ) {
+        if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+
+        INTERSECTED = intersects[ 0 ].object;
+        console.log(intersects[ 0 ].object)
+        INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+        INTERSECTED.material.emissive.setHex( 0xff0ff8 );
+      }
+    } else {
+      if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+      INTERSECTED = null;
+    }
+
     renderer.render( scene, camera )
   }
 
