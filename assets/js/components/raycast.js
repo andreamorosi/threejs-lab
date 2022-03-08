@@ -9,6 +9,7 @@ function raycastFunc() {
 
   let container, stats;
   let camera, scene, raycaster, renderer, dragControls
+  let cubeContainer = document.querySelector('#cube-scene')
 
   let INTERSECTED;
   let theta = 0;
@@ -24,7 +25,7 @@ function raycastFunc() {
     container = document.createElement( 'div' );
     document.body.appendChild( container );
 
-    camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+    camera = new THREE.PerspectiveCamera( 70, cubeContainer.clientWidth / cubeContainer.clientHeight, 1, 10000 );
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0xf0f0f0 );
@@ -60,8 +61,10 @@ function raycastFunc() {
 
     renderer = new THREE.WebGLRenderer();
     renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    container.appendChild( renderer.domElement );
+    //renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize( cubeContainer.clientWidth, cubeContainer.clientHeight )
+    //container.appendChild( renderer.domElement );
+    cubeContainer.appendChild( renderer.domElement )
 
     stats = new Stats();
     container.appendChild( stats.dom );
@@ -86,17 +89,19 @@ function raycastFunc() {
 
   function onWindowResize() {
 
-    camera.aspect = window.innerWidth / window.innerHeight;
+    //camera.aspect = window.innerWidth / window.innerHeight;
+    camera.aspect = cubeContainer.clientWidth / cubeContainer.clientHeight;
     camera.updateProjectionMatrix();
 
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize( cubeContainer.clientWidth, cubeContainer.clientHeight );
 
   }
 
   function onPointerMove( event ) {
+    const {top, left, width, height} = renderer.domElement.getBoundingClientRect();
 
-    pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    pointer.x = ( (event.clientX - left) / width ) * 2 - 1;
+    pointer.y = - ( (event.clientY - top) / height ) * 2 + 1;
 
   }
 
