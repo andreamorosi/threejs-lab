@@ -8,7 +8,7 @@ function raycastFunc() {
 
 
   let container, stats;
-  let camera, scene, raycaster, renderer, dragControls
+  let camera, scene, raycaster, renderer, dragControls, ghostObj
   let cubeContainer = document.querySelector('#cube-scene')
 
   let INTERSECTED;
@@ -81,6 +81,8 @@ function raycastFunc() {
 
     document.addEventListener( 'mousemove', onPointerMove );
 
+    document.addEventListener("dblclick", doubleClick)
+
     //
 
     window.addEventListener( 'resize', onWindowResize );
@@ -103,6 +105,16 @@ function raycastFunc() {
     pointer.x = ( (event.clientX - left) / width ) * 2 - 1;
     pointer.y = - ( (event.clientY - top) / height ) * 2 + 1;
 
+  }
+
+  function doubleClick (event) {
+    console.log(ghostObj)
+    document.querySelector(".ghostinfo").innerHTML = 
+    `
+    <div><em>uuid</em>: ${ghostObj.uuid}</div>
+    <div><em>position</em>: x = ${ghostObj.position.x}, y = ${ghostObj.position.y}, z = ${ghostObj.position.z}</div>
+    <div><em>scale</em>: x = ${ghostObj.scale.x}, y = ${ghostObj.scale.y}, z = ${ghostObj.scale.z}</div>
+    `
   }
 
   //
@@ -142,7 +154,7 @@ function raycastFunc() {
         INTERSECTED = intersects[ 0 ].object;
         INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
         INTERSECTED.material.emissive.setHex( 0xff0000 );
-        console.log(intersects[ 0 ].object)
+        ghostObj = intersects[ 0 ].object
 
       }
 

@@ -76,3 +76,18 @@
     }
   }
 }
+
+.ghostinfo {
+  display: flex;
+  flex-direction: column;
+  background-color: $black;
+  color: $alt;
+  align-items: baseline;
+  @include padding(1,1,1,1);
+
+  div {
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    border-bottom: 1px dashed $smoke;
+  }
+}
